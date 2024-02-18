@@ -1,0 +1,9 @@
+{
+	admin off
+	acme_dns cloudflare "API_KEY"
+}
+
+chat.example.com {
+	encode zstd gzip
+	reverse_proxy client:80
+}

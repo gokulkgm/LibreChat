@@ -11,7 +11,7 @@ services:
       - 3080:3080
     depends_on:
       - mongodb
-    restart: always
+    restart: unless-stopped
     extra_hosts:
     - "host.docker.internal:host-gateway"
     env_file:
@@ -30,9 +30,6 @@ services:
       dockerfile: Dockerfile.multi
       target: prod-stage
     container_name: LibreChat-NGINX
-    ports:
-      - 80:80
-      - 443:443
     depends_on:
       - api
     restart: always
@@ -43,7 +40,7 @@ services:
     # ports:  # Uncomment this to access mongodb from outside docker, not safe in deployment
     #   - 27018:27017
     image: mongo
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./data-node:/data/db
     command: mongod --noauth
@@ -59,3 +56,15 @@ services:
       - MEILI_NO_ANALYTICS=true
     volumes:
       - ./meili_data:/meili_data
+  caddy:
+    build:
+      context: ./caddy
+    container_name: LibreChat-Caddy
+    restart: unless-stopped
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy_data:/data
+      - ./caddy_config:/config
+    ports:
+      - 80:80
+      - 443:443
